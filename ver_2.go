@@ -473,8 +473,18 @@ func tampilkanMobilByKriteria(daf *daftarPabrikan) {
 		tampilkanMobilByTahunKeluar(*daf)
 	case 2:
 		tampilkanMobilByHarga(*daf)
+		if varepeat() != 0 {
+			menuUtama(daf)
+		} else {
+			tampilkanMobilByTahunKeluar(*daf)
+		}
 	case 3:
 		tampilkanMobilByPenjualan(*daf)
+		// if varepeat() != 0 {
+		// 	menuUtama(daf)
+		// } else {
+		// 	tampilkanMobilByTahunKeluar(*daf)
+		// }
 	default:
 		fmt.Println("Pilihan tidak valid. Silakan coba lagi.")
 	}
@@ -511,11 +521,7 @@ func tampilkanMobilByTahunKeluar(daf daftarPabrikan) {
 		pabrikan := getPabrikanByMobil(daf, mobil[i])
 		fmt.Printf("Model: %s, Pabrikan: %s, Harga: Rp%d, Penjualan: %d\n", mobil[i].Model, pabrikan.Nama, mobil[i].Harga, mobil[i].Penjualan)
 	}
-	if varepeat() != 0 {
-		menuUtama(&daf)
-	} else {
-		tampilkanMobilByTahunKeluar(daf)
-	}
+
 }
 
 func tampilkanMobilByHarga(daf daftarPabrikan) {
@@ -549,7 +555,8 @@ func tampilkanMobilByHarga(daf daftarPabrikan) {
 		pabrikan := getPabrikanByMobil(daf, mobil[i])
 		fmt.Printf("Model: %s, Pabrikan: %s, Harga: Rp%d, Penjualan: %d Tahun: %d\n", mobil[i].Model, pabrikan.Nama, mobil[i].Harga, mobil[i].Penjualan, mobil[i].TahunKeluar)
 	}
-	if varepeat() != 0 {
+	fmt.Println("ini halaman menu")
+	if varepeat() >	 0 {
 		menuUtama(&daf)
 	} else {
 		tampilkanMobilByHarga(daf)
