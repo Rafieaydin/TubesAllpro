@@ -517,13 +517,12 @@ func tampilkanMobilByTahunKeluar() {
 }
 
 func tampilkanMobilByHarga() {
-	fmt.Print("Masukkan rentang harga mobil (contoh: 10000000-20000000): ")
-
 	var hargaMin, hargaMax int
-	fmt.Scanf("%d-%d", &hargaMin, &hargaMax)
+
+	fmt.Print("Masukkan rentang harga mobil (contoh: 10000000-20000000): ")
+	fmt.Scanln(&hargaMin, &hargaMax)
 
 	var mobil []Mobil
-
 	for i := 0; i < totalPabrikan; i++ {
 		for j := 0; j < daftarPabrikan[i].nMobil; j++ {
 			if daftarPabrikan[i].Mobil[j].Harga >= hargaMin && daftarPabrikan[i].Mobil[j].Harga <= hargaMax {
@@ -539,14 +538,16 @@ func tampilkanMobilByHarga() {
 		} else {
 			tampilkanMobilByHarga()
 		}
+		return
 	}
 
 	fmt.Println("Daftar mobil dengan harga antara Rp", hargaMin, "dan Rp", hargaMax, ":")
-
 	for i := 0; i < len(mobil); i++ {
 		pabrikan := getPabrikanByMobil(mobil[i])
-		fmt.Printf("Model: %s, Pabrikan: %s, Harga: Rp%d, Penjualan: %d Tahun: %d\n", mobil[i].Model, pabrikan.Nama, mobil[i].Harga, mobil[i].Penjualan, mobil[i].TahunKeluar)
+		fmt.Printf("Model: %s, Pabrikan: %s, Harga: Rp%d, Penjualan: %d, Tahun: %d\n",
+			mobil[i].Model, pabrikan.Nama, mobil[i].Harga, mobil[i].Penjualan, mobil[i].TahunKeluar)
 	}
+
 	if varepeat() != 0 {
 		menuUtama()
 	} else {
