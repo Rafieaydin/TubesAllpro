@@ -5,10 +5,8 @@ import (
 )
 
 type Mobil struct {
-	Model       string
-	TahunKeluar int
-	Harga       int
-	Penjualan   int
+	Model                         string
+	TahunKeluar, Penjualan, Harga int
 }
 
 type Pabrikan struct {
@@ -25,14 +23,16 @@ func main() {
 }
 
 func cariIndexPabrikan(namaPabrikan string) int {
-	// var i = 0
-
-	for i := 0; i < totalPabrikan; i++ {
+	var i = 0
+	var id = -1
+	for i < totalPabrikan && id == -1 {
 		if daftarPabrikan[i].Nama == namaPabrikan {
-			return i
+			id = i
 		}
+		i++
 	}
-	return -1
+
+	return id
 }
 
 func cariIndexMobil(pabrikan *Pabrikan, modelMobil string) int {
@@ -93,6 +93,26 @@ func menuUtama() {
 			} else {
 				fmt.Println()
 				lihatMobilPabrikan()
+			}
+		case 70:
+			if totalPabrikan == 0 {
+				fmt.Println("Data masih kosong")
+				if varepeat() != 0 {
+					menuUtama()
+				}
+			} else {
+				fmt.Println()
+				lihatMobilBerdasaranTahun()
+			}
+		case 60:
+			if totalPabrikan == 0 {
+				fmt.Println("Data masih kosong")
+				if varepeat() != 0 {
+					menuUtama()
+				}
+			} else {
+				fmt.Println()
+				lihatMobilBerdasaranTahun()
 			}
 		case 1:
 			tambahPabrikan()
@@ -267,25 +287,91 @@ func lihatPabrikan() {
 	fmt.Println("===== Lihat Data Pabrikan =====")
 	fmt.Println("===== List Data Pabrikan =====")
 	fmt.Print()
+	var pass = 1
+	for pass < totalPabrikan {
+		var i = pass
+		var temp = daftarPabrikan[i]
+		for i > 0 && temp.nMobil < daftarPabrikan[i-1].nMobil {
+			daftarPabrikan[i] = daftarPabrikan[i-1]
+			i--
+		}
+		daftarPabrikan[i] = temp
+		pass++
+	}
 	for i := 0; i < totalPabrikan; i++ {
-		fmt.Println("Nama pabrik :", daftarPabrikan[i].Nama)
+		fmt.Println("Nama pabrik :", daftarPabrikan[i].Nama, " Jumlah Mobil :", daftarPabrikan[i].nMobil)
 	}
 }
 
 func lihatMobilPabrikan() {
 	fmt.Print()
-	fmt.Println("===== List Data Mobil =====")
-	fmt.Print()
+	fmt.Println("===== Berikut list yang tersedia =====")
 	for i := 0; i < totalPabrikan; i++ {
+		fmt.Println("=============================")
+		fmt.Println("Nama pabrik :", daftarPabrikan[i].Nama)
+		fmt.Println("=============================")
+		fmt.Println("Beikut list mobil dari pabrik", daftarPabrikan[i].Nama)
+		fmt.Println("=============================")
 		for j := 0; j < daftarPabrikan[i].nMobil; j++ {
 			fmt.Println()
-			fmt.Println("Nama pabrik :", daftarPabrikan[i].Nama)
 			fmt.Println("Model mobil :", daftarPabrikan[i].Mobil[j].Model)
 			fmt.Println("Harga :", daftarPabrikan[i].Mobil[j].Harga)
 			fmt.Println("Penjualan :", daftarPabrikan[i].Mobil[j].Penjualan)
 			fmt.Println("Tahun keluar :", daftarPabrikan[i].Mobil[j].TahunKeluar)
 			fmt.Println()
 		}
+	}
+}
+
+func lihatMobilBerdasaranTahun() {
+	fmt.Println("===== Tampilkan 3 Daftar Mobil dan Pabrikan dengan Tahun =====")
+
+	var mobil []Mobil
+
+	for i := 0; i < totalPabrikan; i++ {
+		for j := 0; j < daftarPabrikan[i].nMobil; j++ {
+			mobil = append(mobil, daftarPabrikan[i].Mobil[j]) // insert arr to mobil
+		}
+	}
+
+	if len(mobil) == 0 {
+		fmt.Println("Belum ada data mobil.")
+		if varepeat() != 0 {
+			menuUtama()
+		} else {
+			tampilkanTop3Penjualan()
+		}
+	}
+
+	// Selection sort
+	pass := 0
+	for pass <= len(mobil)-1 {
+		maxIndex := pass // idx =0
+		for i := pass; i < len(mobil); i++ {
+			if mobil[i].TahunKeluar > mobil[maxIndex].TahunKeluar {
+				maxIndex = i
+			}
+		}
+		//mobil[i], mobil[maxIndex] = mobil[maxIndex], mobil[i]
+		var temp = mobil[pass] // i = 0
+		mobil[pass] = mobil[maxIndex]
+		mobil[maxIndex] = temp
+		pass++
+
+	}
+
+	fmt.Println("Daftar mobil dan pabrikan berdasarkan tahuni:")
+
+	for i := 0; i < 3 && i < len(mobil); i++ {
+		m := mobil[i]
+		pabrikan := getPabrikanByMobil(m)
+		fmt.Printf("Model: %s, Pabrikan: %s, tahun :, %d \n", m.Model, pabrikan.Nama, m.TahunKeluar)
+	}
+
+	if varepeat() != 0 {
+		menuUtama()
+	} else {
+		tampilkanTop3Penjualan()
 	}
 }
 
@@ -492,9 +578,30 @@ func tampilkanMobilByTahunKeluar() {
 	var mobil []Mobil
 
 	for i := 0; i < totalPabrikan; i++ {
-		for j := 0; j < daftarPabrikan[i].nMobil; j++ {
-			if daftarPabrikan[i].Mobil[j].TahunKeluar == tahun {
-				mobil = append(mobil, daftarPabrikan[i].Mobil[j])
+		kiri := 0
+		kanan := daftarPabrikan[i].nMobil
+		found := false
+
+		for kiri < kanan && !found {
+			mid := (kiri + kanan) / 2
+
+			if daftarPabrikan[i].Mobil[mid].TahunKeluar == tahun {
+				mobil = append(mobil, daftarPabrikan[i].Mobil[mid])
+				j := mid - 1
+				for j >= kiri && daftarPabrikan[i].Mobil[j].TahunKeluar == tahun {
+					mobil = append(mobil, daftarPabrikan[i].Mobil[j])
+					j--
+				}
+				j = mid + 1
+				for j < kanan && daftarPabrikan[i].Mobil[j].TahunKeluar == tahun {
+					mobil = append(mobil, daftarPabrikan[i].Mobil[j])
+					j++
+				}
+				found = true
+			} else if tahun < daftarPabrikan[i].Mobil[mid].TahunKeluar {
+				kanan = mid
+			} else {
+				kiri = mid + 1
 			}
 		}
 	}
@@ -519,7 +626,7 @@ func tampilkanMobilByTahunKeluar() {
 func tampilkanMobilByHarga() {
 	var hargaMin, hargaMax int
 
-	fmt.Print("Masukkan rentang harga mobil (contoh: 10000000-20000000): ")
+	fmt.Print("Masukkan rentang harga mobil (contoh: min max): ")
 	fmt.Scanln(&hargaMin, &hargaMax)
 
 	var mobil []Mobil
