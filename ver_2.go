@@ -329,60 +329,6 @@ func lihatMobilPabrikan(daf daftarPabrikan) {
 	}
 }
 
-func lihatMobilBerdasaranTahun(daf daftarPabrikan) {
-	fmt.Println("===== Daftar Mobil dan Pabrikan berdasarkan Tahun =====")
-
-	var mobil [NMAX]Mobil
-	var totMobil = 0
-
-	for i := 0; i < daf.totalPabrikan; i++ {
-		for j := 0; j < daf.daftarPabrikan[i].nMobil; j++ {
-			mobil[totMobil] = daf.daftarPabrikan[i].Mobil[j] // insert arr to mobil
-			totMobil++
-		}
-	}
-
-	if len(mobil) == 0 {
-		fmt.Println("Belum ada data mobil.")
-		if varepeat() != 0 {
-			menuUtama(&daf)
-		} else {
-			tampilkanTop3Penjualan(daf)
-		}
-	}
-
-	// Selection sort
-	pass := 0
-	for pass <= len(mobil)-1 {
-		maxIndex := pass // idx =0
-		for i := pass; i < len(mobil); i++ {
-			if mobil[i].TahunKeluar > mobil[maxIndex].TahunKeluar {
-				maxIndex = i
-			}
-		}
-		//mobil[i], mobil[maxIndex] = mobil[maxIndex], mobil[i]
-		var temp = mobil[pass] // i = 0
-		mobil[pass] = mobil[maxIndex]
-		mobil[maxIndex] = temp
-		pass++
-
-	}
-
-	fmt.Println("Daftar mobil dan pabrikan berdasarkan tahuni:")
-
-	for i := 0; i < totMobil && i < len(mobil); i++ {
-		m := mobil[i]
-		pabrikan := getPabrikanByMobil(daf, m)
-		fmt.Printf("Model: %s, Pabrikan: %s, tahun :, %d \n", m.Model, pabrikan.Nama, m.TahunKeluar)
-	}
-
-	if varepeat() != 0 {
-		menuUtama(&daf)
-	} else {
-		tampilkanTop3Penjualan(daf)
-	}
-}
-
 func tambahMobil(daf *daftarPabrikan) {
 	fmt.Println("===== Berikut pabrik mobil yg tersediav =====")
 	lihatPabrikan(*daf)
@@ -624,11 +570,10 @@ func tampilkanMobilByTahunKeluar(daf daftarPabrikan) {
 
 	fmt.Println("Daftar mobil dengan tahun keluaran", tahun, ":")
 
-	for i := 0; i < len(mobil); i++ {
+	for i := 0; i < totalMob; i++ {
 		pabrikan := getPabrikanByMobil(daf, mobil[i])
 		fmt.Printf("Model: %s, Pabrikan: %s, Harga: Rp%d, Penjualan: %d\n", mobil[i].Model, pabrikan.Nama, mobil[i].Harga, mobil[i].Penjualan)
 	}
-
 }
 
 func tampilkanMobilByHarga(daf daftarPabrikan) {
@@ -685,6 +630,7 @@ func tampilkanMobilByPenjualan(daf daftarPabrikan) {
 		for j := 0; j < daf.daftarPabrikan[i].nMobil; j++ {
 			if daf.daftarPabrikan[i].Mobil[j].Penjualan == penjualan {
 				mobil[totalMob] = daf.daftarPabrikan[i].Mobil[j]
+				totalMob++
 			}
 		}
 	}
@@ -695,7 +641,7 @@ func tampilkanMobilByPenjualan(daf daftarPabrikan) {
 
 	fmt.Println("Daftar mobil dengan jumlah penjualan", penjualan, ":")
 
-	for i := 0; i < len(mobil); i++ {
+	for i := 0; i < totalMob; i++ {
 		pabrikan := getPabrikanByMobil(daf, mobil[i])
 		fmt.Printf("Model: %s, Pabrikan: %s, Harga: Rp%d, Penjualan: %d Tahun: %d\n", mobil[i].Model, pabrikan.Nama, mobil[i].Harga, mobil[i].Penjualan, mobil[i].TahunKeluar)
 	}
@@ -703,6 +649,60 @@ func tampilkanMobilByPenjualan(daf daftarPabrikan) {
 		menuUtama(&daf)
 	} else {
 		tampilkanMobilByPenjualan(daf)
+	}
+}
+
+func lihatMobilBerdasaranTahun(daf daftarPabrikan) {
+	fmt.Println("===== Daftar Mobil dan Pabrikan berdasarkan Tahun =====")
+
+	var mobil [NMAX]Mobil
+	var totMobil = 0
+
+	for i := 0; i < daf.totalPabrikan; i++ {
+		for j := 0; j < daf.daftarPabrikan[i].nMobil; j++ {
+			mobil[totMobil] = daf.daftarPabrikan[i].Mobil[j] // insert arr to mobil
+			totMobil++
+		}
+	}
+
+	if len(mobil) == 0 {
+		fmt.Println("Belum ada data mobil.")
+		if varepeat() != 0 {
+			menuUtama(&daf)
+		} else {
+			tampilkanTop3Penjualan(daf)
+		}
+	}
+
+	// Selection sort
+	pass := 0
+	for pass <= len(mobil)-1 {
+		maxIndex := pass // idx =0
+		for i := pass; i < len(mobil); i++ {
+			if mobil[i].TahunKeluar > mobil[maxIndex].TahunKeluar {
+				maxIndex = i
+			}
+		}
+		//mobil[i], mobil[maxIndex] = mobil[maxIndex], mobil[i]
+		var temp = mobil[pass] // i = 0
+		mobil[pass] = mobil[maxIndex]
+		mobil[maxIndex] = temp
+		pass++
+
+	}
+
+	fmt.Println("Daftar mobil dan pabrikan berdasarkan tahuni:")
+
+	for i := 0; i < totMobil && i < len(mobil); i++ {
+		m := mobil[i]
+		pabrikan := getPabrikanByMobil(daf, m)
+		fmt.Printf("Model: %s, Pabrikan: %s, tahun :, %d \n", m.Model, pabrikan.Nama, m.TahunKeluar)
+	}
+
+	if varepeat() != 0 {
+		menuUtama(&daf)
+	} else {
+		tampilkanTop3Penjualan(daf)
 	}
 }
 
@@ -715,6 +715,7 @@ func tampilkanTop3Penjualan(daf daftarPabrikan) {
 	for i := 0; i < daf.totalPabrikan; i++ {
 		for j := 0; j < daf.daftarPabrikan[i].nMobil; j++ {
 			mobil[totalMob] = daf.daftarPabrikan[i].Mobil[j]
+			totalMob++
 		}
 	}
 
